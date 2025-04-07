@@ -1,16 +1,17 @@
 "use client";
 
-import Card from "@/constants/Card";
+import Card from "@/components/Card";
 import {useEffect, useState} from "react";
 import Image from "next/image";
 import {intToString, toDHMS} from "@/utils/number";
 import {CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis} from "recharts";
+import {AuctionCard} from "@/components/AuctionCard";
 
 function AccountCard({username, uuid, startDate, className}) {
     const elapsed = Math.floor((Date.now() - startDate) / 1000);
     return (
         <Card className={className}>
-            <div className="flex flex-rows justify-stretch gap-5">
+            <div className="flex flex-rows items-center justify-stretch gap-5 h-full w-full">
                 <Image
                     src={`https://mc-heads.net/head/${uuid.replace(/-/g, '').trim()}.png`}
                     alt="Minecraft Head"
@@ -19,8 +20,8 @@ function AccountCard({username, uuid, startDate, className}) {
                     height={100}
                 />
                 <div className="flex flex-col gap-1 my-3">
-                    <h1 className="text-2xl text-primary">{username}</h1>
-                    <h2 className="text-lg text-gray-500">{`${toDHMS(elapsed)} elapsed`}</h2>
+                    <h1 className="text-xl text-primary">{username}</h1>
+                    <h2 className="text-md text-gray-500">{`${toDHMS(elapsed)} elapsed`}</h2>
                 </div>
             </div>
         </Card>
@@ -32,9 +33,9 @@ function QuickProfitCard({profit, profitThisHour, startDate, profitThisHourQueue
     return (
         <Card className={className}>
             <div className="flex flex-col gap-1 my-3">
-                <h1 className="text-2xl text-primary">{`Total Profit: ${intToString(profit)} coins (${intToString(profit * 3600 / Math.max(elapsed, 1))} coins/h)`}</h1>
-                <h2 className="text-lg text-gray-500">{`Profit This Hour: ${intToString(profitThisHour)} coins`}</h2>
-                <h2 className="text-lg text-gray-500">{`Profit from Previous Flip: ${intToString(profitThisHourQueue[profitThisHourQueue.length - 1]?.profit || 0)} coins`}</h2>
+                <h1 className="text-xl text-primary">{`Total Profit: ${intToString(profit)} coins (${intToString(profit * 3600 / Math.max(elapsed, 1))} coins/h)`}</h1>
+                <h2 className="text-md text-gray-500">{`Profit This Hour: ${intToString(profitThisHour)} coins`}</h2>
+                <h2 className="text-md text-gray-500">{`Profit from Previous Flip: ${intToString(profitThisHourQueue[profitThisHourQueue.length - 1]?.profit || 0)} coins`}</h2>
             </div>
         </Card>
     );
@@ -80,12 +81,9 @@ function ChatCard({messages, className, onMessage}) {
 function AuctionsDisplayCard({auctions, className}) {
     return (
         <Card className={className}>
-            <div className="flex flex-col gap-1 my-3">
+            <div className="flex flex-row gap-1 my-3">
                 {auctions.map((auction, index) => (
-                    <div key={index} className="flex flex-row gap-2">
-                        <h1 className="text-primary">{auction.username}</h1>
-                        <h2 className="text-gray-500">{auction.message}</h2>
-                    </div>
+                    <AuctionCard key={index} auction={auction} />
                 ))}
             </div>
         </Card>
@@ -107,7 +105,7 @@ function GraphCard({data, className}) {
                 width={500}
                 height={300}
                 data={data}
-                margin={{top: 5, right: 30, left: 20, bottom: 5}}
+                // margin={{top: 5, right: 30, left: 20, bottom: 5}}
             >
                 <CartesianGrid strokeDasharray="3 3"/>
                 <XAxis dataKey="name"/>
@@ -129,28 +127,53 @@ export default function Home() {
     const [profitThisHourQueue, setProfitThisHourQueue] = useState([]);
 
     return (
-        <main className="grid grid-cols-10 grid-rows-6 gap-4 m-8">
+        <main className="grid grid-cols-10 grid-rows-10 gap-4 m-8">
             <AccountCard
                 username={username || "aesthetic0001"}
                 uuid={uuid || "04d4147f0bce4f03a8c2b71884680136"}
                 startDate={startDate}
-                className="col-span-3 row-span-1"/>
+                className="col-span-3 row-span-2"/>
             <QuickProfitCard
                 profit={profit}
                 profitThisHour={profitThisHour}
                 startDate={startDate}
                 profitThisHourQueue={profitThisHourQueue}
-                className="col-span-3 row-span-1"/>
+                className="col-span-3 row-span-2"/>
             <ChatCard
                 messages={[{username: "aesthetic0001", message: "Hello World!"}]}
-                className="col-span-4 row-span-4"
+                className="col-span-4 row-span-10"
                 onMessage={(message) => {
                     console.log(message);
                 }}
             />
             <AuctionsDisplayCard
-                auctions={[{username: "aesthetic0001", message: "Auction 1"}]}
-                className="col-span-6 row-span-1"
+                auctions={[
+                    {
+                        name: "Heroic Hyperion",
+                        uuid: "23456789-2345-2345-2345-234567890123",
+                        auctionUUID: "98765432-5432-5432-5432-321098765432",
+                        category: "BOUGHT",
+                        state: "AWAIT_SELL",
+                        metadata: {
+                            starting_bid: 1_600_000_000,
+                            auction_end: Date.now() + 7200000,
+                            item_id: "HYPERION"
+                        },
+                    },
+                    {
+                        name: "Suspicious Scylla",
+                        uuid: "34567890-3456-3456-3456-345678901234",
+                        auctionUUID: "87654321-6543-6543-6543-210987654321",
+                        category: "BOUGHT",
+                        state: "AWAIT_SELL",
+                        metadata: {
+                            starting_bid: 1_600_000_000,
+                            auction_end: Date.now() + 3600000,
+                            item_id: "SCYLLA"
+                        },
+                    }
+                ]}
+                className="col-span-6 row-span-3"
             />
             <GraphCard
                 data={[
@@ -159,9 +182,8 @@ export default function Home() {
                     { name: '02:00', profit: 200 },
                     { name: '03:00', profit: 278 },
                     { name: '04:00', profit: 189 },
-                    // Add more data points as needed
                 ]}
-                className="col-span-6 row-span-2"
+                className="col-span-6 row-span-5"
             />
         </main>
     )

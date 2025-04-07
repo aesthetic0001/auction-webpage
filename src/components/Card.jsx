@@ -26,7 +26,7 @@ export default function Card({children, className}) {
             onMouseMove={handleMouseMove}
             onMouseLeave={setToMiddle}
             className={
-                clsx("relative bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-md overflow-hidden", className)
+                clsx("relative bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 shadow-md overflow-hidden", className)
             }
         >
             {/* Glass Illumination Layer */}
@@ -37,10 +37,7 @@ export default function Card({children, className}) {
                 }}
             />
 
-            {/* Content */}
-            {/*<div className="relative z-10">*/}
             {children}
-            {/*</div>*/}
         </div>
     );
 }

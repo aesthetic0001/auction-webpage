@@ -8,6 +8,12 @@ const nextConfig = {
                 port: '',
                 pathname: '/**',
             },
+            {
+                protocol: 'https',
+                hostname: 'sky.coflnet.com',
+                port: '',
+                pathname: '/static/icon/**',
+            },
         ],
     },
 };
