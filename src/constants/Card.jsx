@@ -1,23 +1,23 @@
 'use client';
-import { useState, useRef } from 'react';
-import { motion } from 'framer-motion';
+import {useRef, useState} from 'react';
+import clsx from "clsx";
 
-export default function Card({ children }) {
-    const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
+export default function Card({children, className}) {
+    const [mousePos, setMousePos] = useState({x: 0, y: 0});
     const cardRef = useRef(null);
 
     const handleMouseMove = (e) => {
         const rect = cardRef.current.getBoundingClientRect();
         const x = e.clientX - rect.left;
         const y = e.clientY - rect.top;
-        setMousePos({ x, y });
+        setMousePos({x, y});
     };
 
     const setToMiddle = () => {
         const rect = cardRef.current.getBoundingClientRect();
         const x = rect.width / 2;
         const y = rect.height / 2;
-        setMousePos({ x, y });
+        setMousePos({x, y});
     };
 
     return (
@@ -25,7 +25,9 @@ export default function Card({ children }) {
             ref={cardRef}
             onMouseMove={handleMouseMove}
             onMouseLeave={setToMiddle}
-            className="relative bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-md overflow-hidden"
+            className={
+                clsx("relative bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-6 shadow-md overflow-hidden", className)
+            }
         >
             {/* Glass Illumination Layer */}
             <div
@@ -36,9 +38,9 @@ export default function Card({ children }) {
             />
 
             {/* Content */}
-            <div className="relative z-10">
-                {children}
-            </div>
+            {/*<div className="relative z-10">*/}
+            {children}
+            {/*</div>*/}
         </div>
     );
 }
