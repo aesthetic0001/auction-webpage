@@ -143,7 +143,7 @@ function ChatCard({messages, className, onMessage}) {
 function AuctionsDisplayCard({auctions, className}) {
     return (
         <Card className={className}>
-            <div className="flex flex-row gap-1 my-3">
+            <div className="flex flex-row items-center gap-3 h-full w-full overflow-x-scroll no-scrollbar">
                 {Object.keys(auctions).map((auctionID, index) => {
                         const auction = auctions[auctionID]
                         return (

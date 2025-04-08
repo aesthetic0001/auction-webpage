@@ -1,4 +1,7 @@
 @import "tailwindcss";
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 
 @theme {
     --color-primary: #ffffff;
@@ -19,4 +22,16 @@
     --text-xl: clamp(2rem, 1.4718rem + 2.2535vw, 3.5rem);
     --text-2xl: clamp(3rem, 2.2958rem + 3.0047vw, 5rem);
     --text-3xl: clamp(4.0625rem, 2.8521rem + 5.1643vw, 7.5rem)
+}
+
+@layer utilities {
+    /* Hide scrollbar for Chrome, Safari and Opera */
+    .no-scrollbar::-webkit-scrollbar {
+        display: none;
+    }
+    /* Hide scrollbar for IE, Edge and Firefox */
+    .no-scrollbar {
+        -ms-overflow-style: none;  /* IE and Edge */
+        scrollbar-width: none;  /* Firefox */
+    }
 }
