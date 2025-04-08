@@ -93,6 +93,20 @@ export default function Home() {
         {sender: "console", message: "Hello World!"}
     ]);
 
+    // cached websocket url and auth key
+    useEffect(() => {
+        const cachedWebSocket = localStorage.getItem("websocket");
+        const cachedAuthKey = localStorage.getItem("authKey");
+        if (cachedWebSocket) setWebSocket(cachedWebSocket);
+        if (cachedAuthKey) setAuthKey(cachedAuthKey);
+    }, [])
+
+    // save websocket url and auth key to local storage
+    useEffect(() => {
+        localStorage.setItem("websocket", webSocket);
+        localStorage.setItem("authKey", authKey)
+    }, [webSocket, authKey]);
+
     useEffect(() => {
         const interval = setInterval(() => {
             setTick(Date.now());
@@ -140,6 +154,9 @@ export default function Home() {
                             sender: data.sender,
                             message: data.message
                         });
+                        while (draft.length > 100) {
+                            draft.shift();
+                        }
                     }));
                     break;
                 }

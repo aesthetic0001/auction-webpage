@@ -124,7 +124,7 @@ export function ChatCard({messages, className, sendMessage}) {
     return (
         <Card className={className}>
             <div className="flex flex-col h-full gap-1 justify-between">
-                <div className="flex flex-col gap-1 my-3 text-sm no-scrollbar">
+                <div className="flex flex-col gap-1 my-3 text-sm no-scrollbar overflow-y-scroll">
                     {messages.map((message, index) => (
                         <div key={index} className="flex flex-row gap-2">
                             <h1 className="text-primary">[{message.sender}]</h1>
@@ -132,24 +132,26 @@ export function ChatCard({messages, className, sendMessage}) {
                         </div>
                     ))}
                 </div>
-                <div className="flex flex-row gap-2 justify-center text-md">
+                <div className="flex flex-row gap-2 justify-center text-md flex-shrink-0">
                     <input
                         type="text"
                         value={message}
                         onChange={(e) => setMessage(e.target.value)}
+                        onKeyDown={(event) => {
+                            if (event.key === "Enter") {
+                                sendMessage(JSON.stringify({
+                                    type: "CPacketConsoleCommand",
+                                    data: {
+                                        command: message.trim(),
+                                    }
+                                }))
+                                setMessage("");
+                            }
+                        }}
                         className="w-full border border-white/10 rounded-2xl px-5 py-2 bg-transparent text-white"
                         placeholder="Enter a command..."
                     />
                     <button
-                        onSubmit={() => {
-                            sendMessage(JSON.stringify({
-                                type: "CPacketConsoleCommand",
-                                data: {
-                                    command: message.trim(),
-                                }
-                            }))
-                            setMessage("");
-                        }}
                         onClick={() => {
                             sendMessage(JSON.stringify({
                                 type: "CPacketConsoleCommand",
