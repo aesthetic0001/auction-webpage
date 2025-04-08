@@ -5,7 +5,7 @@ import {useEffect, useState} from "react";
 import Image from "next/image";
 import {intToString, toDHMS} from "@/utils/number";
 import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
-import {AuctionCard} from "@/components/AuctionCard";
+import {ActiveAuctionDisplay, AuctionCard, SelectedAuctionContext} from "@/components/AuctionCard";
 import {FaRegPauseCircle, FaRegPlayCircle} from "react-icons/fa";
 import {motion} from 'framer-motion';
 
@@ -57,14 +57,15 @@ function QuickProfitCard({profit, profitThisHour, startDate, profitThisHourQueue
 function StateCard({state, purse, className}) {
     return (
         <Card className={className}>
-            <div className="flex flex-col gap-1 h-full text-center items-center">
-                <h1 className="text-lg text-primary">Bot State</h1>
-                <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Current State: ${state}`}</h2>
-                <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Purse Balance: ${purse}`}</h2>
-                <div className="flex-grow"></div>
-                <div className="grid grid-cols-2 gap-8 mb-3 w-fit">
+            <div className="grid grid-cols-4 items-center justify-stretch gap-5 h-full w-full">
+                <div className="col-span-3">
+                    <h1 className="text-lg text-primary">Bot State</h1>
+                    <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Current State: ${state}`}</h2>
+                    <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Purse Balance: ${purse}`}</h2>
+                </div>
+                <div className="flex flex-col col-span-1 gap-1">
                     <motion.button
-                        className="flex items-center justify-center px-5 py-2 bg-error rounded-2xl hover:cursor-pointer"
+                        className="flex items-center justify-center bg-error rounded-2xl hover:cursor-pointer w-full aspect-square"
                         whileHover={{
                             scale: 1.05
                         }}
@@ -81,7 +82,7 @@ function StateCard({state, purse, className}) {
                         <FaRegPauseCircle className="text-lg"/>
                     </motion.button>
                     <motion.button
-                        className="flex items-center justify-center px-5 py-2 bg-secondary rounded-2xl hover:cursor-pointer"
+                        className="flex items-center justify-center p-1 bg-secondary rounded-2xl hover:cursor-pointer w-full aspect-square"
                         whileHover={{
                             scale: 1.05
                         }}
@@ -109,7 +110,7 @@ function ChatCard({messages, className, onMessage}) {
     return (
         <Card className={className}>
             <div className="flex flex-col h-full gap-1 justify-between">
-                <div className="flex flex-col gap-1 my-3">
+                <div className="flex flex-col gap-1 my-3 text-sm no-scrollbar">
                     {messages.map((message, index) => (
                         <div key={index} className="flex flex-row gap-2">
                             <h1 className="text-primary">[{message.sender}]</h1>
@@ -117,7 +118,7 @@ function ChatCard({messages, className, onMessage}) {
                         </div>
                     ))}
                 </div>
-                <div className="flex flex-row gap-2 justify-center">
+                <div className="flex flex-row gap-2 justify-center text-md">
                     <input
                         type="text"
                         value={message}
@@ -194,7 +195,7 @@ export default function Home() {
     const [profitThisHour, setProfitThisHour] = useState(0);
     const [profitThisHourQueue, setProfitThisHourQueue] = useState([]);
     const [activeAuctions, setActiveAuctions] = useState({
-        "23456789-2345-2345-2345-234567890123": {
+        "98765432-5432-5432-5432-321098765432": {
             name: "Heroic Hyperion",
             uuid: "23456789-2345-2345-2345-234567890123",
             auctionUUID: "98765432-5432-5432-5432-321098765432",
@@ -203,10 +204,15 @@ export default function Home() {
             metadata: {
                 starting_bid: 1_600_000_000,
                 auction_end: Date.now() + 7200000,
-                item_id: "HYPERION"
+                item_id: "HYPERION",
+                profit: 600_000_000,
+                profit_percent: 50,
+                attributes: {},
+                instant_value: [],
+                total_time_to_buy: 150,
             },
         },
-        "34567890-3456-3456-3456-345678901234": {
+        "87654321-6543-6543-6543-210987654321": {
             name: "Suspicious Scylla",
             uuid: "34567890-3456-3456-3456-345678901234",
             auctionUUID: "87654321-6543-6543-6543-210987654321",
@@ -215,7 +221,12 @@ export default function Home() {
             metadata: {
                 starting_bid: 1_600_000_000,
                 auction_end: Date.now() + 3600000,
-                item_id: "SCYLLA"
+                item_id: "SCYLLA",
+                profit: 600_000_000,
+                profit_percent: 50,
+                attributes: {},
+                instant_value: [],
+                total_time_to_buy: 150,
             },
         }
     });
@@ -247,43 +258,46 @@ export default function Home() {
 
     return (
         <div className="h-screen p-8 box-border overflow-hidden">
-            <main className="grid grid-cols-10 grid-rows-10 gap-4 h-full max-h-full">
-                <AccountCard
-                    username={username || "aesthetic0001"}
-                    uuid={uuid || "04d4147f0bce4f03a8c2b71884680136"}
-                    startDate={startDate}
-                    className="col-span-2 row-span-2"
-                />
-                <QuickProfitCard
-                    profit={profit}
-                    profitThisHour={profitThisHour}
-                    startDate={startDate}
-                    profitThisHourQueue={profitThisHourQueue}
-                    className="col-span-2 row-span-2"
-                />
-                <StateCard className="col-span-2 row-span-2" purse={purse} state={botState}/>
-                <ChatCard
-                    messages={[{sender: "console", message: "Hello World!"}]}
-                    className="col-span-4 row-span-10"
-                    onMessage={(message) => {
-                        console.log(message);
-                    }}
-                />
-                <AuctionsDisplayCard
-                    auctions={activeAuctions}
-                    className="col-span-6 row-span-3"
-                />
-                <GraphCard
-                    data={[
-                        {name: '00:00', Profit: 400},
-                        {name: '01:00', Profit: 300},
-                        {name: '02:00', Profit: 200},
-                        {name: '03:00', Profit: 278},
-                        {name: '04:00', Profit: 189},
-                    ]}
-                    className="col-span-6 row-span-5"
-                />
-            </main>
+            <SelectedAuctionContext>
+                <main className="grid grid-cols-10 grid-rows-10 gap-4 h-full max-h-full">
+                    <AccountCard
+                        username={username || "aesthetic0001"}
+                        uuid={uuid || "04d4147f0bce4f03a8c2b71884680136"}
+                        startDate={startDate}
+                        className="col-span-2 row-span-2"
+                    />
+                    <QuickProfitCard
+                        profit={profit}
+                        profitThisHour={profitThisHour}
+                        startDate={startDate}
+                        profitThisHourQueue={profitThisHourQueue}
+                        className="col-span-2 row-span-2"
+                    />
+                    <StateCard className="col-span-2 row-span-2" purse={purse} state={botState}/>
+                    <ChatCard
+                        messages={[{sender: "console", message: "Hello World!"}]}
+                        className="col-span-4 row-span-10"
+                        onMessage={(message) => {
+                            console.log(message);
+                        }}
+                    />
+                    <AuctionsDisplayCard
+                        auctions={activeAuctions}
+                        className="col-span-6 row-span-3"
+                    />
+                    <GraphCard
+                        data={[
+                            {name: '00:00', Profit: 400},
+                            {name: '01:00', Profit: 300},
+                            {name: '02:00', Profit: 200},
+                            {name: '03:00', Profit: 278},
+                            {name: '04:00', Profit: 189},
+                        ]}
+                        className="col-span-6 row-span-5"
+                    />
+                    <ActiveAuctionDisplay auctions={activeAuctions}/>
+                </main>
+            </SelectedAuctionContext>
         </div>
     )
 }
