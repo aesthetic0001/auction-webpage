@@ -109,8 +109,8 @@ export function ActiveAuctionDisplay({auctions}) {
                             </div>
                             <h2 className="text-gray-500 text-lg">Listed for: {intToString(auction.metadata.starting_bid)}</h2>
                             <h2 className="text-gray-500 text-lg">Estimated
-                                profit: {intToString(auction.metadata.profit)} ({auction.metadata.profit_percent.toFixed(2)}%)</h2>
-                            <h2 className="text-gray-500 text-lg">Time to buy: {auction.metadata.total_time_to_buy.toFixed(1)}ms</h2>
+                                profit: {intToString(auction.metadata?.profit || 0)} ({(auction.metadata?.profit_percent || 0).toFixed(2)}%)</h2>
+                            <h2 className="text-gray-500 text-lg">Time to buy: {(auction.metadata?.total_time_to_buy || 0).toFixed(1)}ms</h2>
                             <h2 className="text-gray-500 text-lg">Auction ID: <a
                                 className="text-tertiary hover:underline"
                                 href={`https://sky.coflnet.com/auction/${auction.auctionUUID}`} target="_blank"

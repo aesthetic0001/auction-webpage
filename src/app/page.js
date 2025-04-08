@@ -8,6 +8,8 @@ import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XA
 import {ActiveAuctionDisplay, AuctionCard, SelectedAuctionContext} from "@/components/AuctionCard";
 import {FaRegPauseCircle, FaRegPlayCircle} from "react-icons/fa";
 import {motion} from 'framer-motion';
+import useWebSocket from "react-use-websocket";
+import {produce} from "immer";
 
 function AccountCard({username, uuid, startDate, className}) {
     const elapsed = Math.floor((Date.now() - startDate) / 1000);
@@ -61,7 +63,7 @@ function StateCard({state, purse, className}) {
                 <div className="col-span-3">
                     <h1 className="text-lg text-primary">Bot State</h1>
                     <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Current State: ${state}`}</h2>
-                    <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Purse Balance: ${purse}`}</h2>
+                    <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Purse Balance: ${intToString(purse)} coins`}</h2>
                 </div>
                 <div className="flex flex-col col-span-1 gap-1">
                     <motion.button
@@ -188,6 +190,10 @@ function GraphCard({data, className}) {
 }
 
 export default function Home() {
+    // forces rerenders
+    const [tick, setTick] = useState(Date.now());
+    const [webSocket, setWebSocket] = useState("ws://localhost:8081");
+    const [authKey, setAuthKey] = useState("");
     const [username, setUsername] = useState(null);
     const [uuid, setUuid] = useState(null);
     const [startDate, setStartDate] = useState(Date.now());
@@ -232,29 +238,63 @@ export default function Home() {
     });
     const [purse, setPurse] = useState(0);
     const [botState, setBotState] = useState("IDLE");
-
+    const [messages, setMessages] = useState([
+        {sender: "console", message: "Hello World!"}
+    ]);
 
     useEffect(() => {
-        const websocket = new WebSocket('ws://127.0.0.1:8080');
+        const interval = setInterval(() => {
+            setTick(Date.now());
+        }, 1000);
 
-        websocket.onopen = () => {
-            console.log('WebSocket is connected');
-        };
-
-        websocket.onmessage = (evt) => {
-            const message = (evt.data);
-            console.log('Message from server ', message);
-        };
-
-        websocket.onclose = () => {
-            console.log('WebSocket is closed');
-        };
-
-        return () => {
-            websocket.close();
-        };
+        return () => clearInterval(interval);
     }, []);
 
+    const { lastMessage, sendMessage } = useWebSocket(`${webSocket}/?key=${authKey}`, {
+        onOpen: () => console.log('WebSocket connection opened.'),
+        onClose: () => console.log('WebSocket connection closed.'),
+        onError: (e) => console.error('WebSocket error:', e),
+        shouldReconnect: () => true
+    });
+
+    function update(data) {
+        if (data.username) setUsername(data.username);
+        if (data.uuid) setUuid(data.uuid);
+        if (data.totalProfit) setProfit(data.totalProfit);
+        if (data.profitThisHour) setProfitThisHour(data.profitThisHour);
+        if (data.profitThisHourQueue) setProfitThisHourQueue(data.profitThisHourQueue);
+        if (data.purse) setPurse(data.purse);
+        if (data.state) setBotState(data.state);
+        if (data.active) setActiveAuctions(data.active);
+        if (data.previousMessages) setMessages(data.previousMessages);
+        if (data.startDate) setStartDate(data.startDate);
+        if (data.tick) setTick(data.tick);
+    }
+
+    useEffect(() => {
+        if (lastMessage !== null) {
+            const {type, data} = JSON.parse(lastMessage.data);
+            switch (type) {
+                case "SPacketStats": {
+                    update(data);
+                    break;
+                }
+                case 'SPacketUpdate': {
+                    update(data);
+                    break
+                }
+                case 'SPacketLog': {
+                    setMessages(produce(messages, (draft) => {
+                        draft.push({
+                            sender: data.sender,
+                            message: data.message
+                        });
+                    }));
+                    break;
+                }
+            }
+        }
+    }, [lastMessage]);
 
     return (
         <div className="h-screen p-8 box-border overflow-hidden">
@@ -264,6 +304,7 @@ export default function Home() {
                         username={username || "aesthetic0001"}
                         uuid={uuid || "04d4147f0bce4f03a8c2b71884680136"}
                         startDate={startDate}
+                        tick={tick}
                         className="col-span-2 row-span-2"
                     />
                     <QuickProfitCard
@@ -272,10 +313,11 @@ export default function Home() {
                         startDate={startDate}
                         profitThisHourQueue={profitThisHourQueue}
                         className="col-span-2 row-span-2"
+                        tick={tick}
                     />
-                    <StateCard className="col-span-2 row-span-2" purse={purse} state={botState}/>
+                    <StateCard className="col-span-2 row-span-2" purse={purse} state={botState} tick={tick}/>
                     <ChatCard
-                        messages={[{sender: "console", message: "Hello World!"}]}
+                        messages={messages}
                         className="col-span-4 row-span-10"
                         onMessage={(message) => {
                             console.log(message);
@@ -284,15 +326,10 @@ export default function Home() {
                     <AuctionsDisplayCard
                         auctions={activeAuctions}
                         className="col-span-6 row-span-3"
+                        tick={tick}
                     />
                     <GraphCard
-                        data={[
-                            {name: '00:00', Profit: 400},
-                            {name: '01:00', Profit: 300},
-                            {name: '02:00', Profit: 200},
-                            {name: '03:00', Profit: 278},
-                            {name: '04:00', Profit: 189},
-                        ]}
+                        data={profitThisHourQueue}
                         className="col-span-6 row-span-5"
                     />
                     <ActiveAuctionDisplay auctions={activeAuctions}/>
