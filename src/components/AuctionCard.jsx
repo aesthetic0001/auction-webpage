@@ -19,7 +19,7 @@ export function SelectedAuctionContext({children}) {
     );
 }
 
-export function AuctionCard({auction}) {
+export function AuctionCard({auction, sendMessage}) {
     const {name, auctionUUID, metadata} = auction;
     const {setSelectedAuction} = useContext(ActiveAuctionContext);
 
@@ -34,6 +34,21 @@ export function AuctionCard({auction}) {
 
     const handleRelist = () => {
         console.log(`Relisting auction ${name} (${auction.auctionUUID})`);
+        sendMessage(JSON.stringify({
+            type: "CPacketConsoleCommand",
+            data: {
+                command: `relist ${auctionUUID}`,
+            }
+        }))
+        // could wait for message, but this is a simple solution
+        setTimeout(() => {
+            sendMessage(JSON.stringify({
+                type: "CPacketConsoleCommand",
+                data: {
+                    command: `y`,
+                }
+            }))
+        }, 500)
     };
 
     return (

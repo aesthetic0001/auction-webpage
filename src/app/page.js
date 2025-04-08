@@ -1,192 +1,43 @@
 "use client";
 
-import Card from "@/components/Card";
 import {useEffect, useState} from "react";
-import Image from "next/image";
-import {intToString, toDHMS} from "@/utils/number";
-import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
-import {ActiveAuctionDisplay, AuctionCard, SelectedAuctionContext} from "@/components/AuctionCard";
-import {FaRegPauseCircle, FaRegPlayCircle} from "react-icons/fa";
-import {motion} from 'framer-motion';
-import useWebSocket from "react-use-websocket";
+import {ActiveAuctionDisplay, SelectedAuctionContext} from "@/components/AuctionCard";
+import useWebSocket, {ReadyState} from "react-use-websocket";
 import {produce} from "immer";
+import {AccountCard, AuctionsDisplayCard, ChatCard, GraphCard, QuickProfitCard, StateCard} from "@/components/Cards";
+import Card from "@/components/Card";
 
-function AccountCard({username, uuid, startDate, className}) {
-    const elapsed = Math.floor((Date.now() - startDate) / 1000);
-    return (
-        <Card className={className}>
-            <div className="flex flex-rows items-center justify-stretch gap-5 h-full w-full">
-                <Image
-                    src={`https://mc-heads.net/head/${uuid.replace(/-/g, '').trim()}.png`}
-                    alt="Minecraft Head"
-                    className="border-2 border-white/10 shadow-md p-2 rounded-3xl"
-                    width={100}
-                    height={100}
-                />
-                <div className="flex flex-col my-3">
-                    <h2 className="text-md text-gray-400">Welcome Back</h2>
-                    <h1 className="text-lg text-primary">{username}</h1>
-                    <h2 className="text-md text-gray-500">{`${toDHMS(elapsed)} elapsed`}</h2>
-                </div>
-            </div>
-        </Card>
-    );
-}
-
-function QuickProfitCard({profit, profitThisHour, startDate, profitThisHourQueue, className}) {
-    const elapsed = Math.floor((Date.now() - startDate) / 1000);
-    return (
-        <Card className={className}>
-            <div className="flex flex-rows items-center justify-stretch gap-5 h-full w-full">
-                <Image
-                    src="/gold_block.png"
-                    alt="Gold Block"
-                    className="border-2 border-white/10 shadow-md p-2 rounded-3xl"
-                    width={100}
-                    height={100}
-                />
-                <div className="flex flex-col gap-1 my-3">
-                    <h1 className="text-lg text-primary">Profit Stats</h1>
-                    <h2 className="text-sm text-gray-400 hover:text-accent transition-colors duration-200">{`Total Profit: ${intToString(profit)} coins (${intToString(profit * 3600 / Math.max(elapsed, 1))} coins/h)`}</h2>
-                    <h2 className="text-sm text-gray-400 hover:text-accent transition-colors duration-200">{`Profit This Hour: ${intToString(profitThisHour)} coins`}</h2>
-                    {/*<h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Profit from Previous Flip: ${intToString(profitThisHourQueue[profitThisHourQueue.length - 1]?.profit || 0)} coins`}</h2>*/}
-                </div>
-            </div>
-        </Card>
-    );
-}
-
-function StateCard({state, purse, className}) {
-    return (
-        <Card className={className}>
-            <div className="grid grid-cols-4 items-center justify-stretch gap-5 h-full w-full">
-                <div className="col-span-3">
-                    <h1 className="text-lg text-primary">Bot State</h1>
-                    <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Current State: ${state}`}</h2>
-                    <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Purse Balance: ${intToString(purse)} coins`}</h2>
-                </div>
-                <div className="flex flex-col col-span-1 gap-1">
-                    <motion.button
-                        className="flex items-center justify-center bg-error rounded-2xl hover:cursor-pointer w-full aspect-square"
-                        whileHover={{
-                            scale: 1.05
-                        }}
-                        whileTap={{
-                            scale: 0.98
-                        }}
-                        transition={{
-                            scale: {
-                                ease: 'easeInOut',
-                                duration: 0.1
-                            }
-                        }}
-                    >
-                        <FaRegPauseCircle className="text-lg"/>
-                    </motion.button>
-                    <motion.button
-                        className="flex items-center justify-center p-1 bg-secondary rounded-2xl hover:cursor-pointer w-full aspect-square"
-                        whileHover={{
-                            scale: 1.05
-                        }}
-                        whileTap={{
-                            scale: 0.98
-                        }}
-                        transition={{
-                            scale: {
-                                ease: 'easeInOut',
-                                duration: 0.1
-                            }
-                        }}
-                    >
-                        <FaRegPlayCircle className="text-lg"/>
-                    </motion.button>
-                </div>
-            </div>
-        </Card>
-    );
-}
-
-function ChatCard({messages, className, onMessage}) {
-    const [message, setMessage] = useState("");
-
-    return (
-        <Card className={className}>
-            <div className="flex flex-col h-full gap-1 justify-between">
-                <div className="flex flex-col gap-1 my-3 text-sm no-scrollbar">
-                    {messages.map((message, index) => (
-                        <div key={index} className="flex flex-row gap-2">
-                            <h1 className="text-primary">[{message.sender}]</h1>
-                            <h2 className="text-gray-500">{message.message}</h2>
-                        </div>
-                    ))}
-                </div>
-                <div className="flex flex-row gap-2 justify-center text-md">
+function WebsocketIndicator({connected, authKey, websocket, setWebSocket, setAuthKey}) {
+    const [settingsOpen, setSettingsOpen] = useState(false);
+    // bottom right corner, pinned to the screen
+    // also has a small circle that is green if connected, red if not
+    // on click: opens a dialog to change the websocket url and auth key
+    return <div className="absolute bottom-0 left-0 m-4 p-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 shadow-md">
+        <button onClick={() => setSettingsOpen(!settingsOpen)} className="flex flex-row items-center gap-2">
+            <div className={`w-3 h-3 rounded-full ${connected ? "bg-green-500" : "bg-red-500"}`}/>
+            <h1 className="text-sm text-gray-500">{connected ? "Connected" : "Disconnected"}</h1>
+        </button>
+        {
+            settingsOpen && (
+                <div className="flex flex-col gap-2 mt-2">
                     <input
                         type="text"
-                        value={message}
-                        onChange={(e) => setMessage(e.target.value)}
-                        className="w-full border border-white/10 rounded-2xl px-5 py-2 bg-transparent text-white"
-                        placeholder="Enter a command..."
+                        value={websocket}
+                        onChange={(e) => setWebSocket(e.target.value)}
+                        className="border border-white/10 rounded-2xl px-5 py-2 bg-transparent text-white"
+                        placeholder="WebSocket URL"
                     />
-                    <button
-                        onClick={() => {
-                            onMessage(message);
-                            setMessage("");
-                        }}
-                        className="bg-secondary text-primary rounded-2xl p-2"
-                    >
-                        Send
-                    </button>
+                    <input
+                        type="text"
+                        value={authKey}
+                        onChange={(e) => setAuthKey(e.target.value)}
+                        className="border border-white/10 rounded-2xl px-5 py-2 bg-transparent text-white"
+                        placeholder="Auth Key"
+                    />
                 </div>
-            </div>
-        </Card>
-    );
-}
-
-function AuctionsDisplayCard({auctions, className}) {
-    return (
-        <Card className={className}>
-            <div className="flex flex-row items-center gap-3 h-full w-full overflow-x-scroll no-scrollbar">
-                {Object.keys(auctions).map((auctionID, index) => {
-                        const auction = auctions[auctionID]
-                        return (
-                            <AuctionCard key={index} auction={auction}/>
-                        )
-                    }
-                )}
-            </div>
-        </Card>
-    );
-}
-
-function GraphCard({data, className}) {
-    const [isReady, setIsReady] = useState(false);
-
-    useEffect(() => {
-        setIsReady(true);
-    }, []);
-
-    if (!isReady) return null;
-
-    return (
-        <Card className={className}>
-            <ResponsiveContainer width="100%" height="100%">
-                <LineChart
-                    width={100}
-                    height={100}
-                    data={data}
-                    // margin={{top: 5, right: 30, left: 20, bottom: 5}}
-                >
-                    <CartesianGrid strokeDasharray="3 3"/>
-                    <XAxis dataKey="name"/>
-                    <YAxis/>
-                    <Tooltip/>
-                    <Legend/>
-                    <Line type="monotone" dataKey="Profit" stroke="#8884d8" activeDot={{r: 8}}/>
-                </LineChart>
-            </ResponsiveContainer>
-        </Card>
-    );
+            )
+        }
+    </div>
 }
 
 export default function Home() {
@@ -250,10 +101,10 @@ export default function Home() {
         return () => clearInterval(interval);
     }, []);
 
-    const { lastMessage, sendMessage } = useWebSocket(`${webSocket}/?key=${authKey}`, {
+    const {lastMessage, sendMessage, readyState} = useWebSocket(`${webSocket}/?key=${authKey}`, {
         onOpen: () => console.log('WebSocket connection opened.'),
         onClose: () => console.log('WebSocket connection closed.'),
-        onError: (e) => console.error('WebSocket error:', e),
+        onError: (e) => console.log('WebSocket error:', e),
         shouldReconnect: () => true
     });
 
@@ -267,7 +118,7 @@ export default function Home() {
         if (data.state) setBotState(data.state);
         if (data.active) setActiveAuctions(data.active);
         if (data.previousMessages) setMessages(data.previousMessages);
-        if (data.startDate) setStartDate(data.startDate);
+        if (data.start) setStartDate(data.start);
         if (data.tick) setTick(data.tick);
     }
 
@@ -315,24 +166,25 @@ export default function Home() {
                         className="col-span-2 row-span-2"
                         tick={tick}
                     />
-                    <StateCard className="col-span-2 row-span-2" purse={purse} state={botState} tick={tick}/>
+                    <StateCard className="col-span-2 row-span-2" purse={purse} state={botState} tick={tick} sendMessage={sendMessage}/>
                     <ChatCard
                         messages={messages}
                         className="col-span-4 row-span-10"
-                        onMessage={(message) => {
-                            console.log(message);
-                        }}
+                        sendMessage={sendMessage}
                     />
                     <AuctionsDisplayCard
                         auctions={activeAuctions}
                         className="col-span-6 row-span-3"
                         tick={tick}
+                        sendMessage={sendMessage}
                     />
                     <GraphCard
                         data={profitThisHourQueue}
                         className="col-span-6 row-span-5"
                     />
                     <ActiveAuctionDisplay auctions={activeAuctions}/>
+                    <WebsocketIndicator connected={readyState === ReadyState.OPEN} websocket={webSocket}
+                                        authKey={authKey} setWebSocket={setWebSocket} setAuthKey={setAuthKey}/>
                 </main>
             </SelectedAuctionContext>
         </div>
