@@ -4,7 +4,7 @@ import Card from "@/components/Card";
 import {useEffect, useState} from "react";
 import Image from "next/image";
 import {intToString, toDHMS} from "@/utils/number";
-import {CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis} from "recharts";
+import {CartesianGrid, Legend, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis} from "recharts";
 import {AuctionCard} from "@/components/AuctionCard";
 import {FaRegPauseCircle, FaRegPlayCircle} from "react-icons/fa";
 import {motion} from 'framer-motion';
@@ -112,7 +112,7 @@ function ChatCard({messages, className, onMessage}) {
                 <div className="flex flex-col gap-1 my-3">
                     {messages.map((message, index) => (
                         <div key={index} className="flex flex-row gap-2">
-                            <h1 className="text-primary">{message.username}</h1>
+                            <h1 className="text-primary">[{message.sender}]</h1>
                             <h2 className="text-gray-500">{message.message}</h2>
                         </div>
                     ))}
@@ -167,19 +167,21 @@ function GraphCard({data, className}) {
 
     return (
         <Card className={className}>
-            <LineChart
-                width={500}
-                height={300}
-                data={data}
-                // margin={{top: 5, right: 30, left: 20, bottom: 5}}
-            >
-                <CartesianGrid strokeDasharray="3 3"/>
-                <XAxis dataKey="name"/>
-                <YAxis/>
-                <Tooltip/>
-                <Legend/>
-                <Line type="monotone" dataKey="profit" stroke="#8884d8" activeDot={{r: 8}}/>
-            </LineChart>
+            <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                    width={100}
+                    height={100}
+                    data={data}
+                    // margin={{top: 5, right: 30, left: 20, bottom: 5}}
+                >
+                    <CartesianGrid strokeDasharray="3 3"/>
+                    <XAxis dataKey="name"/>
+                    <YAxis/>
+                    <Tooltip/>
+                    <Legend/>
+                    <Line type="monotone" dataKey="Profit" stroke="#8884d8" activeDot={{r: 8}}/>
+                </LineChart>
+            </ResponsiveContainer>
         </Card>
     );
 }
@@ -238,7 +240,7 @@ export default function Home() {
                 />
                 <StateCard className="col-span-2 row-span-2" purse={purse} state={botState}/>
                 <ChatCard
-                    messages={[{username: "aesthetic0001", message: "Hello World!"}]}
+                    messages={[{sender: "console", message: "Hello World!"}]}
                     className="col-span-4 row-span-10"
                     onMessage={(message) => {
                         console.log(message);
@@ -250,11 +252,11 @@ export default function Home() {
                 />
                 <GraphCard
                     data={[
-                        {name: '00:00', profit: 400},
-                        {name: '01:00', profit: 300},
-                        {name: '02:00', profit: 200},
-                        {name: '03:00', profit: 278},
-                        {name: '04:00', profit: 189},
+                        {name: '00:00', Profit: 400},
+                        {name: '01:00', Profit: 300},
+                        {name: '02:00', Profit: 200},
+                        {name: '03:00', Profit: 278},
+                        {name: '04:00', Profit: 189},
                     ]}
                     className="col-span-6 row-span-5"
                 />
