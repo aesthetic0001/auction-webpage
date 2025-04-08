@@ -222,6 +222,29 @@ export default function Home() {
     const [purse, setPurse] = useState(0);
     const [botState, setBotState] = useState("IDLE");
 
+
+    useEffect(() => {
+        const websocket = new WebSocket('ws://127.0.0.1:8080');
+
+        websocket.onopen = () => {
+            console.log('WebSocket is connected');
+        };
+
+        websocket.onmessage = (evt) => {
+            const message = (evt.data);
+            console.log('Message from server ', message);
+        };
+
+        websocket.onclose = () => {
+            console.log('WebSocket is closed');
+        };
+
+        return () => {
+            websocket.close();
+        };
+    }, []);
+
+
     return (
         <div className="h-screen p-8 box-border overflow-hidden">
             <main className="grid grid-cols-10 grid-rows-10 gap-4 h-full max-h-full">
