@@ -82,9 +82,13 @@ function AuctionsDisplayCard({auctions, className}) {
     return (
         <Card className={className}>
             <div className="flex flex-row gap-1 my-3">
-                {auctions.map((auction, index) => (
-                    <AuctionCard key={index} auction={auction} />
-                ))}
+                {Object.keys(auctions).map((auctionID, index) => {
+                        const auction = auctions[auctionID]
+                        return (
+                            <AuctionCard key={index} auction={auction}/>
+                        )
+                    }
+                )}
             </div>
         </Card>
     );
@@ -109,10 +113,10 @@ function GraphCard({data, className}) {
             >
                 <CartesianGrid strokeDasharray="3 3"/>
                 <XAxis dataKey="name"/>
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line type="monotone" dataKey="profit" stroke="#8884d8" activeDot={{ r: 8 }} />
+                <YAxis/>
+                <Tooltip/>
+                <Legend/>
+                <Line type="monotone" dataKey="profit" stroke="#8884d8" activeDot={{r: 8}}/>
             </LineChart>
         </Card>
     );
@@ -125,66 +129,71 @@ export default function Home() {
     const [profit, setProfit] = useState(0);
     const [profitThisHour, setProfitThisHour] = useState(0);
     const [profitThisHourQueue, setProfitThisHourQueue] = useState([]);
+    const [activeAuctions, setActiveAuctions] = useState({
+        "23456789-2345-2345-2345-234567890123": {
+            name: "Heroic Hyperion",
+            uuid: "23456789-2345-2345-2345-234567890123",
+            auctionUUID: "98765432-5432-5432-5432-321098765432",
+            category: "BOUGHT",
+            state: "AWAIT_SELL",
+            metadata: {
+                starting_bid: 1_600_000_000,
+                auction_end: Date.now() + 7200000,
+                item_id: "HYPERION"
+            },
+        },
+        "34567890-3456-3456-3456-345678901234": {
+            name: "Suspicious Scylla",
+            uuid: "34567890-3456-3456-3456-345678901234",
+            auctionUUID: "87654321-6543-6543-6543-210987654321",
+            category: "BOUGHT",
+            state: "AWAIT_SELL",
+            metadata: {
+                starting_bid: 1_600_000_000,
+                auction_end: Date.now() + 3600000,
+                item_id: "SCYLLA"
+            },
+        }
+    });
 
     return (
-        <main className="grid grid-cols-10 grid-rows-10 gap-4 m-8">
-            <AccountCard
-                username={username || "aesthetic0001"}
-                uuid={uuid || "04d4147f0bce4f03a8c2b71884680136"}
-                startDate={startDate}
-                className="col-span-3 row-span-2"/>
-            <QuickProfitCard
-                profit={profit}
-                profitThisHour={profitThisHour}
-                startDate={startDate}
-                profitThisHourQueue={profitThisHourQueue}
-                className="col-span-3 row-span-2"/>
-            <ChatCard
-                messages={[{username: "aesthetic0001", message: "Hello World!"}]}
-                className="col-span-4 row-span-10"
-                onMessage={(message) => {
-                    console.log(message);
-                }}
-            />
-            <AuctionsDisplayCard
-                auctions={[
-                    {
-                        name: "Heroic Hyperion",
-                        uuid: "23456789-2345-2345-2345-234567890123",
-                        auctionUUID: "98765432-5432-5432-5432-321098765432",
-                        category: "BOUGHT",
-                        state: "AWAIT_SELL",
-                        metadata: {
-                            starting_bid: 1_600_000_000,
-                            auction_end: Date.now() + 7200000,
-                            item_id: "HYPERION"
-                        },
-                    },
-                    {
-                        name: "Suspicious Scylla",
-                        uuid: "34567890-3456-3456-3456-345678901234",
-                        auctionUUID: "87654321-6543-6543-6543-210987654321",
-                        category: "BOUGHT",
-                        state: "AWAIT_SELL",
-                        metadata: {
-                            starting_bid: 1_600_000_000,
-                            auction_end: Date.now() + 3600000,
-                            item_id: "SCYLLA"
-                        },
-                    }
-                ]}
-                className="col-span-6 row-span-3"
-            />
-            <GraphCard
-                data={[
-                    { name: '00:00', profit: 400 },
-                    { name: '01:00', profit: 300 },
-                    { name: '02:00', profit: 200 },
-                    { name: '03:00', profit: 278 },
-                    { name: '04:00', profit: 189 },
-                ]}
-                className="col-span-6 row-span-5"
-            />
-        </main>
+        <div className="h-screen p-8 box-border overflow-hidden">
+            <main className="grid grid-cols-10 grid-rows-10 gap-4 h-full max-h-full">
+                <AccountCard
+                    username={username || "aesthetic0001"}
+                    uuid={uuid || "04d4147f0bce4f03a8c2b71884680136"}
+                    startDate={startDate}
+                    className="col-span-3 row-span-2"
+                />
+                <QuickProfitCard
+                    profit={profit}
+                    profitThisHour={profitThisHour}
+                    startDate={startDate}
+                    profitThisHourQueue={profitThisHourQueue}
+                    className="col-span-3 row-span-2"
+                />
+                <ChatCard
+                    messages={[{username: "aesthetic0001", message: "Hello World!"}]}
+                    className="col-span-4 row-span-10"
+                    onMessage={(message) => {
+                        console.log(message);
+                    }}
+                />
+                <AuctionsDisplayCard
+                    auctions={activeAuctions}
+                    className="col-span-6 row-span-3"
+                />
+                <GraphCard
+                    data={[
+                        {name: '00:00', profit: 400},
+                        {name: '01:00', profit: 300},
+                        {name: '02:00', profit: 200},
+                        {name: '03:00', profit: 278},
+                        {name: '04:00', profit: 189},
+                    ]}
+                    className="col-span-6 row-span-5"
+                />
+            </main>
+        </div>
     )
 }
