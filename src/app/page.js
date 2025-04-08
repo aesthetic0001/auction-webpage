@@ -45,8 +45,8 @@ function QuickProfitCard({profit, profitThisHour, startDate, profitThisHourQueue
                 />
                 <div className="flex flex-col gap-1 my-3">
                     <h1 className="text-lg text-primary">{`Profit Stats`}</h1>
-                    <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Total Profit: ${intToString(profit)} coins (${intToString(profit * 3600 / Math.max(elapsed, 1))} coins/h)`}</h2>
-                    <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Profit This Hour: ${intToString(profitThisHour)} coins`}</h2>
+                    <h2 className="text-sm text-gray-400 hover:text-accent transition-colors duration-200">{`Total Profit: ${intToString(profit)} coins (${intToString(profit * 3600 / Math.max(elapsed, 1))} coins/h)`}</h2>
+                    <h2 className="text-sm text-gray-400 hover:text-accent transition-colors duration-200">{`Profit This Hour: ${intToString(profitThisHour)} coins`}</h2>
                     {/*<h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Profit from Previous Flip: ${intToString(profitThisHourQueue[profitThisHourQueue.length - 1]?.profit || 0)} coins`}</h2>*/}
                 </div>
             </div>
