@@ -12,16 +12,15 @@
     --color-warning: #f4b737;
     --color-background: #161617;
     --color-card: #222121;
-    --text-2xs: 0.1rem + 0.3756vw;
-    --text-xs: 0.2rem + 0.3756vw;
-    --text-s: 0.4rem + 0.3756vw;
-    --text-md: 0.6rem + 0.3756vw;
-    --text-2md: 0.8rem + 0.3756vw;
-    --text-lg: 1rem + 0.3756vw;
-    --text-2lg: 1.2rem + 0.3756vw;
-    --text-xl: 1.5rem + 0.3756vw;
-    --text-2xl: 1.75rem + 0.3756vw;
-    --text-3xl: 2rem + 0.3756vw;
+    --text-2xs: 0.75vw;
+    --text-xs: 0.75vw;
+    --text-sm: 0.75vw;
+    --text-md: 0.8vw;
+    --text-lg: 1.1vw;
+    --text-2lg: 0.75vw;
+    --text-xl: 0.75vw;
+    --text-2xl: 0.75vw;
+    --text-3xl: 0.75vw;
 }
 
 @layer utilities {
