@@ -6,6 +6,8 @@ import Image from "next/image";
 import {intToString, toDHMS} from "@/utils/number";
 import {CartesianGrid, Legend, Line, LineChart, Tooltip, XAxis, YAxis} from "recharts";
 import {AuctionCard} from "@/components/AuctionCard";
+import {FaRegPauseCircle, FaRegPlayCircle} from "react-icons/fa";
+import {motion} from 'framer-motion';
 
 function AccountCard({username, uuid, startDate, className}) {
     const elapsed = Math.floor((Date.now() - startDate) / 1000);
@@ -19,8 +21,9 @@ function AccountCard({username, uuid, startDate, className}) {
                     width={100}
                     height={100}
                 />
-                <div className="flex flex-col gap-1 my-3">
-                    <h1 className="text-xl text-primary">{username}</h1>
+                <div className="flex flex-col my-3">
+                    <h2 className="text-md text-gray-400">Welcome Back</h2>
+                    <h1 className="text-lg text-primary">{username}</h1>
                     <h2 className="text-md text-gray-500">{`${toDHMS(elapsed)} elapsed`}</h2>
                 </div>
             </div>
@@ -32,10 +35,69 @@ function QuickProfitCard({profit, profitThisHour, startDate, profitThisHourQueue
     const elapsed = Math.floor((Date.now() - startDate) / 1000);
     return (
         <Card className={className}>
-            <div className="flex flex-col gap-1 my-3">
-                <h1 className="text-xl text-primary">{`Total Profit: ${intToString(profit)} coins (${intToString(profit * 3600 / Math.max(elapsed, 1))} coins/h)`}</h1>
-                <h2 className="text-md text-gray-500">{`Profit This Hour: ${intToString(profitThisHour)} coins`}</h2>
-                <h2 className="text-md text-gray-500">{`Profit from Previous Flip: ${intToString(profitThisHourQueue[profitThisHourQueue.length - 1]?.profit || 0)} coins`}</h2>
+            <div className="flex flex-rows items-center justify-stretch gap-5 h-full w-full">
+                <Image
+                    src="/gold_block.png"
+                    alt="Gold Block"
+                    className="border-2 border-white/10 shadow-md p-2 rounded-3xl"
+                    width={100}
+                    height={100}
+                />
+                <div className="flex flex-col gap-1 my-3">
+                    <h1 className="text-lg text-primary">{`Profit Stats`}</h1>
+                    <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Total Profit: ${intToString(profit)} coins (${intToString(profit * 3600 / Math.max(elapsed, 1))} coins/h)`}</h2>
+                    <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Profit This Hour: ${intToString(profitThisHour)} coins`}</h2>
+                    {/*<h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Profit from Previous Flip: ${intToString(profitThisHourQueue[profitThisHourQueue.length - 1]?.profit || 0)} coins`}</h2>*/}
+                </div>
+            </div>
+        </Card>
+    );
+}
+
+function StateCard({state, purse, className}) {
+    return (
+        <Card className={className}>
+            <div className="flex flex-col gap-1 h-full text-center items-center">
+                <h1 className="text-lg text-primary">Bot State</h1>
+                <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Current State: ${state}`}</h2>
+                <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Purse Balance: ${purse}`}</h2>
+                <div className="flex-grow"></div>
+                <div className="grid grid-cols-2 gap-8 mb-3 w-fit">
+                    <motion.button
+                        className="flex items-center justify-center px-5 py-2 bg-error rounded-2xl hover:cursor-pointer"
+                        whileHover={{
+                            scale: 1.05
+                        }}
+                        whileTap={{
+                            scale: 0.98
+                        }}
+                        transition={{
+                            scale: {
+                                ease: 'easeInOut',
+                                duration: 0.1
+                            }
+                        }}
+                    >
+                        <FaRegPauseCircle className="text-lg"/>
+                    </motion.button>
+                    <motion.button
+                        className="flex items-center justify-center px-5 py-2 bg-secondary rounded-2xl hover:cursor-pointer"
+                        whileHover={{
+                            scale: 1.05
+                        }}
+                        whileTap={{
+                            scale: 0.98
+                        }}
+                        transition={{
+                            scale: {
+                                ease: 'easeInOut',
+                                duration: 0.1
+                            }
+                        }}
+                    >
+                        <FaRegPlayCircle className="text-lg"/>
+                    </motion.button>
+                </div>
             </div>
         </Card>
     );
@@ -155,6 +217,8 @@ export default function Home() {
             },
         }
     });
+    const [purse, setPurse] = useState(0);
+    const [botState, setBotState] = useState("IDLE");
 
     return (
         <div className="h-screen p-8 box-border overflow-hidden">
@@ -163,15 +227,16 @@ export default function Home() {
                     username={username || "aesthetic0001"}
                     uuid={uuid || "04d4147f0bce4f03a8c2b71884680136"}
                     startDate={startDate}
-                    className="col-span-3 row-span-2"
+                    className="col-span-2 row-span-2"
                 />
                 <QuickProfitCard
                     profit={profit}
                     profitThisHour={profitThisHour}
                     startDate={startDate}
                     profitThisHourQueue={profitThisHourQueue}
-                    className="col-span-3 row-span-2"
+                    className="col-span-2 row-span-2"
                 />
+                <StateCard className="col-span-2 row-span-2" purse={purse} state={botState}/>
                 <ChatCard
                     messages={[{username: "aesthetic0001", message: "Hello World!"}]}
                     className="col-span-4 row-span-10"
