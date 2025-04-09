@@ -144,7 +144,7 @@ export default function Home() {
                     update(data);
                     break;
                 }
-                case 'SPacketUpdate': {
+                case 'SPacketStatsUpdate': {
                     update(data);
                     break
                 }
