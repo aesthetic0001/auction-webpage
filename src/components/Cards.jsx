@@ -152,7 +152,7 @@ export function ChatCard({className, messages, sendMessage}) {
     return (<Card className={className}>
         <div className="flex flex-col h-full gap-1 justify-between">
             <div
-                className="flex flex-col gap-1 my-3 text-sm no-scrollbar overflow-y-scroll bg-background p-3 rounded-3xl"
+                className="flex flex-col gap-1 my-3 text-sm no-scrollbar overflow-y-scroll bg-background p-3 rounded-3xl scroll-smooth"
                 ref={messagesContainerRef}
             >
                 {messages.map((message, index) => (<div key={index} className="flex flex-row gap-2">
@@ -185,15 +185,42 @@ export function ChatCard({className, messages, sendMessage}) {
     </Card>);
 }
 
-export function AuctionsDisplayCard({auctions, className, sendMessage}) {
-    return (<Card className={className}>
-        <div className="flex flex-row items-center gap-3 h-full w-full overflow-x-scroll no-scrollbar">
-            {Object.keys(auctions).map((auctionID, index) => {
-                const auction = auctions[auctionID]
-                return (<AuctionCard key={index} auction={auction} sendMessage={sendMessage}/>)
-            })}
-        </div>
-    </Card>);
+export function AuctionsDisplayCard({ auctions, className, sendMessage }) {
+    const scrollRef = useRef(null);
+
+    useEffect(() => {
+        const el = scrollRef.current;
+        if (!el) return;
+
+        const onWheel = (e) => {
+            if (e.deltaY === 0) return;
+            e.preventDefault();
+            el.scrollLeft += e.deltaY;
+        };
+
+        el.addEventListener("wheel", onWheel, { passive: false });
+        return () => el.removeEventListener("wheel", onWheel);
+    }, []);
+
+    return (
+        <Card className={className}>
+            <div
+                ref={scrollRef}
+                className="flex flex-row items-center gap-3 h-full w-full overflow-x-scroll no-scrollbar scroll-smooth"
+            >
+                {Object.keys(auctions).map((auctionID, index) => {
+                    const auction = auctions[auctionID];
+                    return (
+                        <AuctionCard
+                            key={index}
+                            auction={auction}
+                            sendMessage={sendMessage}
+                        />
+                    );
+                })}
+            </div>
+        </Card>
+    );
 }
 
 export function GraphCard({data, className}) {
@@ -205,20 +232,29 @@ export function GraphCard({data, className}) {
 
     if (!isReady) return null;
 
+    const processedData = data.map(entry => ({
+        name: new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        Profit: entry.profit
+    }));
+
     return (<Card className={className}>
         <ResponsiveContainer width="100%" height="100%">
             <LineChart
                 width={100}
                 height={100}
-                data={data}
-                // margin={{top: 5, right: 30, left: 20, bottom: 5}}
+                data={processedData}
             >
-                <CartesianGrid strokeDasharray="3 3"/>
-                <XAxis dataKey="name"/>
-                <YAxis/>
-                <Tooltip/>
-                <Legend/>
-                <Line type="monotone" dataKey="Profit" stroke="#8884d8" activeDot={{r: 8}}/>
+                <CartesianGrid strokeDasharray="3 3" />
+                <XAxis dataKey="name" />
+                <YAxis />
+                <Tooltip />
+                <Legend />
+                <Line
+                    type="monotone"
+                    dataKey="Profit"
+                    stroke="#8884d8"
+                    activeDot={{ r: 8 }}
+                />
             </LineChart>
         </ResponsiveContainer>
     </Card>);
