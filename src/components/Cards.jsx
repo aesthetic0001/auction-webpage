@@ -49,13 +49,14 @@ export function QuickProfitCard({profit, profitThisHour, startDate, profitThisHo
     </Card>);
 }
 
-export function StateCard({state, purse, className, sendMessage}) {
+export function StateCard({state, purse, className, totalSlots, activeAuctions, cacheSize}) {
     return (<Card className={className}>
         <div className="grid grid-cols-4 items-center justify-stretch gap-5 h-full w-full">
             <div className="col-span-3">
                 <h1 className="text-lg text-primary">Bot State</h1>
                 <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Current State: ${state}`}</h2>
                 <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Purse Balance: ${intToString(purse)} coins`}</h2>
+                <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`${Object.keys(activeAuctions).length}/${totalSlots} auction slots filled (${cacheSize} queued)`}</h2>
             </div>
             <div className="flex flex-col col-span-1 gap-1">
                 <motion.button
@@ -252,6 +253,7 @@ export function GraphCard({ data, className }) {
                             new Date(timestamp).toLocaleTimeString('en-US', {
                                 hour: '2-digit',
                                 minute: '2-digit',
+                                second: '2-digit',
                                 hour12: false
                             })
                         }
@@ -263,6 +265,7 @@ export function GraphCard({ data, className }) {
                             new Date(label).toLocaleTimeString('en-US', {
                                 hour: '2-digit',
                                 minute: '2-digit',
+                                second: '2-digit',
                                 hour12: false
                             })
                         }
@@ -271,6 +274,7 @@ export function GraphCard({ data, className }) {
                     <Line
                         type="monotone"
                         dataKey="Profit"
+                        name="Profit per update"
                         stroke="#8884d8"
                         activeDot={{ r: 8 }}
                     />

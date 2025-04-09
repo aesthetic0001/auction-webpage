@@ -5,14 +5,14 @@ import {ActiveAuctionDisplay, SelectedAuctionContext} from "@/components/Auction
 import useWebSocket, {ReadyState} from "react-use-websocket";
 import {produce} from "immer";
 import {AccountCard, AuctionsDisplayCard, ChatCard, GraphCard, QuickProfitCard, StateCard} from "@/components/Cards";
-import Card from "@/components/Card";
 
 function WebsocketIndicator({connected, authKey, websocket, setWebSocket, setAuthKey}) {
     const [settingsOpen, setSettingsOpen] = useState(false);
     // bottom right corner, pinned to the screen
     // also has a small circle that is green if connected, red if not
     // on click: opens a dialog to change the websocket url and auth key
-    return <div className="absolute bottom-0 left-0 m-4 p-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 shadow-md">
+    return <div
+        className="absolute bottom-0 left-0 m-4 p-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 shadow-md">
         <button onClick={() => setSettingsOpen(!settingsOpen)} className="flex flex-row items-center gap-2">
             <div className={`w-3 h-3 rounded-full ${connected ? "bg-green-500" : "bg-red-500"}`}/>
             <h1 className="text-sm text-gray-500">{connected ? "Connected" : "Disconnected"}</h1>
@@ -92,6 +92,8 @@ export default function Home() {
     const [messages, setMessages] = useState([
         {sender: "console", message: "Hello World!"}
     ]);
+    const [totalSlots, setTotalSlots] = useState(14);
+    const [cacheSize, setCacheSize] = useState(0);
 
     // cached websocket url and auth key
     useEffect(() => {
@@ -134,6 +136,7 @@ export default function Home() {
         if (data.previousMessages) setMessages(data.previousMessages);
         if (data.start) setStartDate(data.start);
         if (data.tick) setTick(data.tick);
+        if (data.totalSlots) setTotalSlots(data.totalSlots);
     }
 
     useEffect(() => {
@@ -183,7 +186,8 @@ export default function Home() {
                         className="col-span-2 row-span-2"
                         tick={tick}
                     />
-                    <StateCard className="col-span-2 row-span-2" purse={purse} state={botState} tick={tick} sendMessage={sendMessage}/>
+                    <StateCard className="col-span-2 row-span-2" purse={purse} state={botState} tick={tick}
+                               activeAuctions={activeAuctions} totalSlots={totalSlots} cacheSize={cacheSize}/>
                     <ChatCard
                         messages={messages}
                         className="col-span-4 row-span-10"
