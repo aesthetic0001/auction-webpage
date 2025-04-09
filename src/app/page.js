@@ -137,6 +137,7 @@ export default function Home() {
         if (data.start) setStartDate(data.start);
         if (data.tick) setTick(data.tick);
         if (data.totalSlots) setTotalSlots(data.totalSlots);
+        if (data.cacheSize) setCacheSize(data.cacheSize);
     }
 
     useEffect(() => {
