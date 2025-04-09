@@ -223,7 +223,7 @@ export function AuctionsDisplayCard({ auctions, className, sendMessage }) {
     );
 }
 
-export function GraphCard({data, className}) {
+export function GraphCard({ data, className }) {
     const [isReady, setIsReady] = useState(false);
 
     useEffect(() => {
@@ -233,29 +233,49 @@ export function GraphCard({data, className}) {
     if (!isReady) return null;
 
     const processedData = data.map(entry => ({
-        name: new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
+        date: entry.date,
         Profit: Math.floor(entry.profit)
     }));
 
-    return (<Card className={className}>
-        <ResponsiveContainer width="100%" height="100%">
-            <LineChart
-                width={100}
-                height={100}
-                data={processedData}
-            >
-                <CartesianGrid strokeDasharray="3 3" />
-                <XAxis dataKey="name" />
-                <YAxis />
-                <Tooltip />
-                <Legend />
-                <Line
-                    type="monotone"
-                    dataKey="Profit"
-                    stroke="#8884d8"
-                    activeDot={{ r: 8 }}
-                />
-            </LineChart>
-        </ResponsiveContainer>
-    </Card>);
+    return (
+        <Card className={className}>
+            <ResponsiveContainer width="100%" height="100%">
+                <LineChart
+                    width={100}
+                    height={100}
+                    data={processedData}
+                >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis
+                        dataKey="date"
+                        tickFormatter={(timestamp) =>
+                            new Date(timestamp).toLocaleTimeString('en-US', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false
+                            })
+                        }
+                    />
+                    <YAxis tickFormatter={intToString} />
+                    <Tooltip
+                        formatter={(value) => intToString(value)}
+                        labelFormatter={(label) =>
+                            new Date(label).toLocaleTimeString('en-US', {
+                                hour: '2-digit',
+                                minute: '2-digit',
+                                hour12: false
+                            })
+                        }
+                    />
+                    <Legend />
+                    <Line
+                        type="monotone"
+                        dataKey="Profit"
+                        stroke="#8884d8"
+                        activeDot={{ r: 8 }}
+                    />
+                </LineChart>
+            </ResponsiveContainer>
+        </Card>
+    );
 }

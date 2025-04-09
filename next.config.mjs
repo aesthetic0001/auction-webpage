@@ -15,7 +15,9 @@ const nextConfig = {
                 pathname: '/static/icon/**',
             },
         ],
+        unoptimized: true,
     },
+    output: 'export',
 };
 
 export default nextConfig;
