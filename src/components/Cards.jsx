@@ -234,7 +234,7 @@ export function GraphCard({data, className}) {
 
     const processedData = data.map(entry => ({
         name: new Date(entry.date).toLocaleDateString('en-US', { month: 'short', day: 'numeric' }),
-        Profit: entry.profit
+        Profit: Math.floor(entry.profit)
     }));
 
     return (<Card className={className}>
