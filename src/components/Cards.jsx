@@ -20,9 +20,9 @@ export function AccountCard({username, uuid, startDate, className}) {
                 height={100}
             />
             <div className="flex flex-col my-3">
-                <h2 className="text-md text-gray-400">Welcome Back</h2>
-                <h1 className="text-lg text-primary">{username}</h1>
-                <h2 className="text-md text-gray-500">{`${toDHMS(elapsed)} elapsed`}</h2>
+                <h2 className="md:text-md text-gray-400">Welcome Back</h2>
+                <h1 className="md:text-lg text-primary">{username}</h1>
+                <h2 className="md:text-md text-gray-500">{`${toDHMS(elapsed)} elapsed`}</h2>
             </div>
         </div>
     </Card>);
@@ -40,9 +40,9 @@ export function QuickProfitCard({profit, profitThisHour, startDate, profitThisHo
                 height={100}
             />
             <div className="flex flex-col gap-1 my-3">
-                <h1 className="text-lg text-primary">Profit Stats</h1>
-                <h2 className="text-sm text-gray-400 hover:text-accent transition-colors duration-200">{`Total Profit: ${intToString(profit)} coins (${intToString(profit * 3600 / Math.max(elapsed, 1))} coins/h)`}</h2>
-                <h2 className="text-sm text-gray-400 hover:text-accent transition-colors duration-200">{`Profit This Hour: ${intToString(profitThisHour)} coins`}</h2>
+                <h1 className="md:text-lg text-primary">Profit Stats</h1>
+                <h2 className="md:text-sm text-gray-400 hover:text-accent transition-colors duration-200">{`Total Profit: ${intToString(profit)} coins (${intToString(profit * 3600 / Math.max(elapsed, 1))} coins/h)`}</h2>
+                <h2 className="md:text-sm text-gray-400 hover:text-accent transition-colors duration-200">{`Profit This Hour: ${intToString(profitThisHour)} coins`}</h2>
                 {/*<h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Profit from Previous Flip: ${intToString(profitThisHourQueue[profitThisHourQueue.length - 1]?.profit || 0)} coins`}</h2>*/}
             </div>
         </div>
@@ -51,16 +51,16 @@ export function QuickProfitCard({profit, profitThisHour, startDate, profitThisHo
 
 export function StateCard({state, purse, className, totalSlots, activeAuctions, cacheSize}) {
     return (<Card className={className}>
-        <div className="grid grid-cols-4 items-center justify-stretch gap-5 h-full w-full">
+        <div className="md:grid md:grid-cols-4 md:items-center md:justify-stretch md:gap-5 md:h-full md:w-full">
             <div className="col-span-3">
-                <h1 className="text-lg text-primary">Bot State</h1>
-                <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Current State: ${state}`}</h2>
-                <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Purse Balance: ${intToString(purse)} coins`}</h2>
-                <h2 className="text-md text-gray-400 hover:text-accent transition-colors duration-200">{`${Object.keys(activeAuctions).length}/${totalSlots} auction slots filled (${cacheSize} queued)`}</h2>
+                <h1 className="md:text-lg text-primary">Bot State</h1>
+                <h2 className="md:text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Current State: ${state}`}</h2>
+                <h2 className="md:text-md text-gray-400 hover:text-accent transition-colors duration-200">{`Purse Balance: ${intToString(purse)} coins`}</h2>
+                <h2 className="md:text-md text-gray-400 hover:text-accent transition-colors duration-200">{`${Object.keys(activeAuctions).length}/${totalSlots} auction slots filled (${cacheSize} queued)`}</h2>
             </div>
-            <div className="flex flex-col col-span-1 gap-1">
+            <div className="flex w-full gap-3 md:flex-col md:col-span-1 md:gap-1 mt-4 md:mt-0">
                 <motion.button
-                    className="flex items-center justify-center bg-error rounded-2xl hover:cursor-pointer w-full aspect-square"
+                    className="flex items-center justify-center bg-error rounded-2xl hover:cursor-pointer w-full h-10 md:h-auto md:aspect-square"
                     onClick={() => {
                         sendMessage(JSON.stringify({
                             type: "CPacketConsoleCommand", data: {
@@ -80,10 +80,10 @@ export function StateCard({state, purse, className, totalSlots, activeAuctions, 
                         }
                     }}
                 >
-                    <FaRegPauseCircle className="text-lg"/>
+                    <FaRegPauseCircle className=""/>
                 </motion.button>
                 <motion.button
-                    className="flex items-center justify-center p-1 bg-secondary rounded-2xl hover:cursor-pointer w-full aspect-square"
+                    className="flex items-center justify-center p-1 bg-secondary rounded-2xl hover:cursor-pointer w-full h-10 md:h-auto md:aspect-square"
                     onClick={() => {
                         sendMessage(JSON.stringify({
                             type: "CPacketConsoleCommand", data: {
@@ -103,7 +103,7 @@ export function StateCard({state, purse, className, totalSlots, activeAuctions, 
                         }
                     }}
                 >
-                    <FaRegPlayCircle className="text-lg"/>
+                    <FaRegPlayCircle className=""/>
                 </motion.button>
             </div>
         </div>
@@ -151,9 +151,9 @@ export function ChatCard({className, messages, sendMessage}) {
     const convert = useRef(new Convert());
 
     return (<Card className={className}>
-        <div className="flex flex-col h-full gap-1 justify-between">
+        <div className="flex flex-col h-[50vh] gap-1 justify-between w-full md:h-full">
             <div
-                className="flex flex-col gap-1 my-3 text-sm no-scrollbar overflow-y-scroll bg-background p-3 rounded-3xl scroll-smooth"
+                className="flex flex-col gap-1 my-3 md:text-sm no-scrollbar overflow-y-scroll bg-background p-3 rounded-3xl scroll-smooth"
                 ref={messagesContainerRef}
             >
                 {messages.map((message, index) => (<div key={index} className="flex flex-row gap-2">
@@ -162,7 +162,7 @@ export function ChatCard({className, messages, sendMessage}) {
                 </div>))}
                 <div ref={messagesEndRef}/>
             </div>
-            <div className="flex flex-row gap-2 justify-center text-md flex-shrink-0">
+            <div className="flex flex-row gap-2 justify-center md:text-md flex-shrink-0">
                 <input
                     type="text"
                     value={message}

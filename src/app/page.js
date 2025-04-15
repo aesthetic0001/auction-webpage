@@ -12,10 +12,10 @@ function WebsocketIndicator({connected, authKey, websocket, setWebSocket, setAut
     // also has a small circle that is green if connected, red if not
     // on click: opens a dialog to change the websocket url and auth key
     return <div
-        className="absolute bottom-0 left-0 m-4 p-2 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 shadow-md">
+        className="fixed md:absolute bottom-0 right-0 md:left-0 m-4 bg-white/5 backdrop-blur-md border border-white/10 rounded-2xl p-4 shadow-md w-fit md:w-fit">
         <button onClick={() => setSettingsOpen(!settingsOpen)} className="flex flex-row items-center gap-2">
             <div className={`w-3 h-3 rounded-full ${connected ? "bg-green-500" : "bg-red-500"}`}/>
-            <h1 className="text-sm text-gray-500">{connected ? "Connected" : "Disconnected"}</h1>
+            <h1 className="md:text-sm text-gray-500">{connected ? "Connected" : "Disconnected"}</h1>
         </button>
         {
             settingsOpen && (
@@ -169,45 +169,45 @@ export default function Home() {
     }, [lastMessage]);
 
     return (
-        <div className="h-screen p-8 box-border overflow-hidden">
+        <div className="h-screen p-8 box-border">
             <SelectedAuctionContext>
-                <main className="grid grid-cols-10 grid-rows-10 gap-4 h-full max-h-full">
+                <div className="md:grid md:grid-cols-10 md:grid-rows-10 md:gap-4 md:h-full md:max-h-full flex flex-col space-y-4 md:space-y-0">
                     <AccountCard
                         username={username || "aesthetic0001"}
                         uuid={uuid || "04d4147f0bce4f03a8c2b71884680136"}
                         startDate={startDate}
                         tick={tick}
-                        className="col-span-2 row-span-2"
+                        className="md:col-span-2 md:row-span-2"
                     />
                     <QuickProfitCard
                         profit={profit}
                         profitThisHour={profitThisHour}
                         startDate={startDate}
                         profitThisHourQueue={profitThisHourQueue}
-                        className="col-span-2 row-span-2"
+                        className="md:col-span-2 md:row-span-2"
                         tick={tick}
                     />
-                    <StateCard className="col-span-2 row-span-2" purse={purse} state={botState} tick={tick}
+                    <StateCard className="md:col-span-2 md:row-span-2" purse={purse} state={botState} tick={tick}
                                activeAuctions={activeAuctions} totalSlots={totalSlots} cacheSize={cacheSize}/>
                     <ChatCard
                         messages={messages}
-                        className="col-span-4 row-span-10"
+                        className="md:col-span-4 md:row-span-10"
                         sendMessage={sendMessage}
                     />
                     <AuctionsDisplayCard
                         auctions={activeAuctions}
-                        className="col-span-6 row-span-3"
+                        className="md:col-span-6 md:row-span-3"
                         tick={tick}
                         sendMessage={sendMessage}
                     />
                     <GraphCard
                         data={profitThisHourQueue}
-                        className="col-span-6 row-span-5"
+                        className="md:col-span-6 md:row-span-5 hidden md:block"
                     />
                     <ActiveAuctionDisplay auctions={activeAuctions}/>
                     <WebsocketIndicator connected={readyState === ReadyState.OPEN} websocket={webSocket}
                                         authKey={authKey} setWebSocket={setWebSocket} setAuthKey={setAuthKey}/>
-                </main>
+                </div>
             </SelectedAuctionContext>
         </div>
     )

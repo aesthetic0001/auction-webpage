@@ -61,26 +61,26 @@ export function AuctionCard({auction, sendMessage}) {
                     alt={name}
                     className="border-2 border-white/10 shadow-md p-2 rounded-3xl"
                 />
-                <h1 className="text-primary text-md">{name}</h1>
+                <h1 className="text-primary md:text-md">{name}</h1>
             </div>
-            <h2 className="text-gray-500 text-sm">{`Listed for: ${intToString(metadata.starting_bid)}`}</h2>
-            <h2 className="text-gray-500 text-sm">{`Ends in: ${toDHMS((metadata.auction_end - Date.now()) / 1000)}`}</h2>
+            <h2 className="text-gray-500 md:text-sm">{`Listed for: ${intToString(metadata.starting_bid)}`}</h2>
+            <h2 className="text-gray-500 md:text-sm">{`Ends in: ${toDHMS((metadata.auction_end - Date.now()) / 1000)}`}</h2>
             <div className="flex flex-row self-end gap-2">
                 <button
                     onClick={handleRelist}
-                    className="text-sm px-3 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition hover:cursor-pointer"
+                    className="md:text-sm px-3 py-2 bg-yellow-500 text-white rounded-lg hover:bg-yellow-600 transition hover:cursor-pointer"
                 >
                     <GrPowerReset/>
                 </button>
                 <button
                     onClick={handleExpand}
-                    className="text-sm px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition hover:cursor-pointer"
+                    className="md:text-sm px-3 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition hover:cursor-pointer"
                 >
                     <TbZoomScan/>
                 </button>
                 <button
                     onClick={handleOpenLink}
-                    className="text-sm px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition hover:cursor-pointer"
+                    className="md:text-sm px-3 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition hover:cursor-pointer"
                 >
                     <FaExternalLinkAlt/>
                 </button>
@@ -120,18 +120,18 @@ export function ActiveAuctionDisplay({auctions}) {
                                     alt={auction.name}
                                     className="border-2 border-white/10 shadow-md p-2 rounded-3xl"
                                 />
-                                <h1 className="text-primary text-xl">{auction.name}</h1>
+                                <h1 className="text-primary md:text-xl">{auction.name}</h1>
                             </div>
-                            <h2 className="text-gray-500 text-lg">Listed for: {intToString(auction.metadata.starting_bid)}</h2>
-                            <h2 className="text-gray-500 text-lg">Estimated
+                            <h2 className="text-gray-500 md:text-lg">Listed for: {intToString(auction.metadata.starting_bid)}</h2>
+                            <h2 className="text-gray-500 md:text-lg">Estimated
                                 profit: {intToString(auction.metadata?.profit || 0)} ({(auction.metadata?.profit_percent || 0).toFixed(2)}%)</h2>
-                            <h2 className="text-gray-500 text-lg">Time to buy: {(auction.metadata?.total_time_to_buy || 0).toFixed(1)}ms</h2>
-                            <h2 className="text-gray-500 text-lg">Auction ID: <a
+                            <h2 className="text-gray-500 md:text-lg">Time to buy: {(auction.metadata?.total_time_to_buy || 0).toFixed(1)}ms</h2>
+                            <h2 className="text-gray-500 md:text-lg">Auction ID: <a
                                 className="text-tertiary hover:underline"
                                 href={`https://sky.coflnet.com/auction/${auction.auctionUUID}`} target="_blank"
                                 rel="noopener noreferrer">{auction.auctionUUID}</a></h2>
 
-                            <h2 className="text-gray-500 text-lg">{`Ends in: ${toDHMS((auction.metadata.auction_end - Date.now()) / 1000)}`}</h2>
+                            <h2 className="text-gray-500 md:text-lg">{`Ends in: ${toDHMS((auction.metadata.auction_end - Date.now()) / 1000)}`}</h2>
                         </Card>
                     </motion.div>
                 </div>
