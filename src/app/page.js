@@ -171,7 +171,7 @@ export default function Home() {
     return (
         <div className="h-screen p-8 box-border">
             <SelectedAuctionContext>
-                <div className="md:grid md:grid-cols-10 md:grid-rows-10 md:gap-4 md:h-full md:max-h-full flex flex-col space-y-4 md:space-y-0">
+                <main className="md:grid md:grid-cols-10 md:grid-rows-10 md:gap-4 md:h-full md:max-h-full flex flex-col space-y-4 md:space-y-0">
                     <AccountCard
                         username={username || "aesthetic0001"}
                         uuid={uuid || "04d4147f0bce4f03a8c2b71884680136"}
@@ -207,7 +207,7 @@ export default function Home() {
                     <ActiveAuctionDisplay auctions={activeAuctions}/>
                     <WebsocketIndicator connected={readyState === ReadyState.OPEN} websocket={webSocket}
                                         authKey={authKey} setWebSocket={setWebSocket} setAuthKey={setAuthKey}/>
-                </div>
+                </main>
             </SelectedAuctionContext>
         </div>
     )
