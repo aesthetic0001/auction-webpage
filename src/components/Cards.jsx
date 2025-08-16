@@ -116,6 +116,14 @@ export function ChatCard({className, messages, sendMessage}) {
     const [isAutoScroll, setIsAutoScroll] = useState(true);
     const [message, setMessage] = useState("");
 
+    // normalize commands so /foo becomes "chat /foo" in backend
+    const normalizeConsoleCommand = (raw) => {
+        const cmd = raw.trim();
+        if (cmd.toLowerCase().startsWith("chat ")) return cmd;
+        if (cmd.startsWith("/")) return `chat ${cmd}`;
+        return cmd;
+    };
+
     const scrollToBottom = () => {
         messagesEndRef.current?.scrollIntoView({behavior: "smooth"});
     };
@@ -140,10 +148,10 @@ export function ChatCard({className, messages, sendMessage}) {
 
     const handleSend = () => {
         if (message.trim() === "") return;
+        const command = normalizeConsoleCommand(message);
         sendMessage(JSON.stringify({
-            type: "CPacketConsoleCommand", data: {
-                command: message.trim(),
-            },
+            type: "CPacketConsoleCommand",
+            data: { command }
         }));
         setMessage("");
     };
